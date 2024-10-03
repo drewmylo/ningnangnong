@@ -1,0 +1,240 @@
+---
+title: "Dependency Injection"
+date: "2024-10-03"
+slug: "dependency-injection"
+---
+
+# Dependency Injection
+
+## The Spring Application Context
+
+The best explanation of the *Spring Application Context* that I have found is at:
+[What is Spring Framework? An Unorthodox Guide](https://www.marcobehler.com/guides/spring-framework)
+
+
+
+The *Spring Application Context*
+
+* It creates and configures the beans according to the metadata.
+* It manages the lifecycle of the beans, handling their creation, initialization, and destruction.
+* It provides access to the beans through various methods like getBean().
+
+## Spring Beans
+A Spring Bean is essentially an **object** whose creation, proliferation and destruction is left to the Spring Framework. 
+Not every bean in Spring is a singleton. While singleton is the default scope for beans in Spring, there are other scopes available:
+
+**Prototype**: A new bean instance is created each time it is requested.\
+**Request**: A new bean instance is created for each HTTP request (in web applications).\
+**Session**: A new bean instance is created for each HTTP session (in web applications).\
+**Application**: A new bean instance is created for each ServletContext (in web applications).\
+**Custom**: It is possible to define a custom scope.
+**Thread**: A new bean instance will be created by Spring when requested by a new thread, while for the same thread, the same bean instance will be returned. Note that this scope is not registered by default.
+**WebSocket**: A new bean instance is created for each WebSocket session (in WebSocket applications).
+
+
+### Stereotype Annotations:
+
+**@Component**: A generic stereotype annotation for any Spring-managed component. \
+**@Service**: Indicates a class that provides a business service. \
+**@Repository**: Indicates a class that provides data access operations (e.g., a DAO class). \
+**@Controller**: Indicates a class that handles web requests in Spring MVC applications. \
+**@RestController**: A specialized version of @Controller for creating RESTful web services. 
+
+### Configuration Annotations: 
+
+**@Configuration**: Marks a class as a source of bean definitions.\
+**@Bean**: Used on methods within a @Configuration class to define a bean.
+
+### What's the difference between the Stereotype and Configuration Annotations?
+| Feature             | 	Stereotype Annotations	                      | Configuration Annotations                                 |
+|---------------------|-----------------------------------------------|-----------------------------------------------------------|
+| Bean Definition     | Implicit (via component scanning)             | Explicit (using @Bean methods)                            |
+| Configuration Style | Declarative (annotations on classes)	         | Programmatic (Java code)                                  |
+| Flexibility         | Less flexible (limited to component scanning) | 	More flexible (allows conditional logic)                 |
+| Use Cases	          | Best for simple components with clear roles	  | Best for complex bean configurations or conditional logic |
+
+#### Injection Methods
+
+##### Constructor Injection
+```java
+import org.springframework.stereotype.Service;
+
+@Service
+public class GreetingService {
+    private final MessageProvider messageProvider;
+
+    public GreetingService(MessageProvider messageProvider) {
+        this.messageProvider = messageProvider;
+    }
+
+    public String getGreeting() {
+        return messageProvider.getMessage() + " from Spring Boot!";
+    }
+}
+
+@Service
+public class MessageProvider {
+    public String getMessage() {
+        return "Hello";
+    }
+}
+```
+
+##### Setter Injection
+```java
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Service
+public class GreetingService {
+    private MessageProvider messageProvider;
+
+    @Autowired
+    public void setMessageProvider(MessageProvider messageProvider) {
+        this.messageProvider = messageProvider;
+    }
+
+    public String getGreeting() {
+        return messageProvider.getMessage() + " from Spring Boot!";
+    }
+}
+
+@Service
+public class MessageProvider {
+    public String getMessage() {
+        return "Hello";
+    }
+}
+```
+
+##### Field Injection
+```java
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Service
+public class GreetingService {
+    @Autowired
+    private MessageProvider messageProvider;
+
+    public String getGreeting() {
+        return messageProvider.getMessage() + " from Spring Boot!";
+    }
+}
+
+@Service
+public class MessageProvider {
+    public String getMessage() {
+        return "Hello";
+    }
+}
+```
+Note that the authors of *Pro Spring 6* advise against the use of field injection for the following reasons
+* Increases difficulty of refactoring the class because it can lead to bloat.
+* It can hide dependencies.
+* The bean is no longer a POJO and can't be instantiated without Spring.
+#### Injecting Values
+application.properties file in your src/main/resources directory has the following content:
+
+```yaml
+app:
+    greeting: "Hello from config"
+```
+
+```java
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+
+@Service
+public class GreetingService {
+
+    @Value("${app.greeting}")
+    private String greetingMessage;
+
+    public String getGreeting() {
+        return greetingMessage;
+    }
+}
+
+```
+
+
+#### Injecting Collections
+```java
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
+@Service
+public class GreetingAggregator {
+
+    @Autowired
+    private List<GreetingProvider> greetingProviders;
+
+    public List<String> getAllGreetings() {
+        return greetingProviders.stream()
+                                .map(GreetingProvider::getGreeting)
+                                .toList();
+    }
+}
+
+public interface GreetingProvider {
+    String getGreeting();
+}
+
+@Service
+public class EnglishGreetingProvider implements GreetingProvider {
+    public String getGreeting() {
+        return "Hello";
+    }
+}
+
+@Service
+public class FrenchGreetingProvider implements GreetingProvider {
+    public String getGreeting() {
+        return "Bonjour";
+    }
+}
+
+```
+#### Method Injection
+```java
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Service
+public class GreetingService {
+
+    private String message;
+
+    @Autowired
+    public void prepareMessage(MessageProvider messageProvider) {
+        this.message = messageProvider.getMessage();
+    }
+
+    public String getGreeting() {
+        return message + " from Spring Boot!";
+    }
+}
+
+@Service
+public class MessageProvider {
+    public String getMessage() {
+        return "Hello";
+    }
+}
+
+```
+#### Autowiring
+
+Autowiring is the process of implicitly injecting beans into beans depending on them. Spring supports five modes for autowiring:
+byName: When using byName autowiring, Spring attempts to wire each property to a bean of the same name. So, if the target bean has a property named foo and a foo bean is defined in ApplicationContext, the foo bean is assigned to the foo property of the target.
+
+byType: When using byType autowiring, Spring attempts to wire each of the properties on the target bean by automatically using a bean of the same type in ApplicationContext.
+
+constructor: This functions just like byType wiring, except that it uses constructors rather than setters to perform the injection. Spring attempts to match the greatest numbers of arguments it can in the constructor. So, if your bean has two constructors, one that accepts a String and one that accepts String and an Integer, and you have both a String and an Integer bean in your ApplicationContext, Spring uses the two-argument constructor.
+
+default: Spring will choose between the constructor and byType modes automatically. If your bean has a default (no-arguments) constructor, Spring uses byType; otherwise, it uses constructor.
+
+no: No autowiring; this is the default.
+
