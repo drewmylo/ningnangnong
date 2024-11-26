@@ -23,19 +23,18 @@ const SDPage = ({ data }) => {
 }
 
 export const query = graphql`
-  query {
-    allMdx(sort: { frontmatter: { date: DESC }}) {
-      nodes {
-        frontmatter {
-          date(formatString: "MMMM D, YYYY")
-          title
-          slug
-        }
-        id
+{
+  allMdx(sort: {frontmatter: {date: DESC}}, filter:{frontmatter: {category: {eq: "spring"}}}) {
+    nodes {
+      frontmatter {
+        date(formatString: "MMMM D, YYYY")
+        title
+        slug
       }
+      id
     }
   }
-`
+}`
 
 export const Head = () => <Seo title="Spring Distilled Posts" />
 

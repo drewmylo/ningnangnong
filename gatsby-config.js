@@ -16,6 +16,14 @@ module.exports = {
         path: `${__dirname}/spring_distilled`
       }
     },
+    {
+      resolve: "gatsby-source-filesystem",
+      options: {
+        name: `musings`,
+        path: `${__dirname}/musings`
+      }
+    },
+
     "gatsby-plugin-mdx",
 ],
 }
