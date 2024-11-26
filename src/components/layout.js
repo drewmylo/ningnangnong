@@ -52,6 +52,11 @@ const Layout = ({ pageTitle, children }) => {
               Tech Adventures
             </Link>
           </li>
+          <li className={navLinkItem}>
+            <Link to="/basher" className={navLinkText}>
+              Basher
+            </Link>
+          </li>
 
         </ul>
       </nav>
