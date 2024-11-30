@@ -1,0 +1,46 @@
+.terminal {
+  width: 100%;
+  height: 200px;
+  background-color: black;
+  color: lime;
+  font-family: monospace;
+  font-size: 16px;
+  padding: 10px;
+}
+
+.terminalInput {
+  border: none;
+  outline: none;
+  width: 90%;
+  background-color: black;
+  color: lime;
+  font-family: monospace;
+  font-size: 16px;
+  padding: 10px;
+}
+
+progress {
+  border-radius: 7px;
+  width: 100%;
+  height: 44px;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 10px;
+}
+progress::-webkit-progress-bar {
+  background-color: black;
+  border-radius: 7px;
+}
+progress::-webkit-progress-value {
+  background-color: #d45500;
+  border-radius: 7px;
+}
+progress::-moz-progress-bar {
+  /* style rules */
+}
+
+.progressText {
+  color: white;
+  position: absolute;
+  left: 50%;
+  font-size: 36px;
+}
