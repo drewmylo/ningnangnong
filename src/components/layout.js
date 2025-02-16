@@ -1,30 +1,30 @@
-import * as React from 'react'
-import { Link, useStaticQuery, graphql } from 'gatsby'
+import * as React from 'react';
+import { Link, useStaticQuery, graphql } from 'gatsby';
 import {
   container,
   heading,
   navLinks,
   navLinkItem,
-  navLinkText,  
-} from './layout.module.css'
-import Logo from './ning_nang_nong_logo.svg'
+  navLinkText,
+} from './layout.module.css';
+import Logo from './ning_nang_nong_logo.svg';
 
 const Layout = ({ pageTitle, children }) => {
-    const data = useStaticQuery(graphql`
-        query {
-          site {
-            siteMetadata {
-              title
-            }
-          }
+  const data = useStaticQuery(graphql`
+    query {
+      site {
+        siteMetadata {
+          title
         }
-      `)
-    
+      }
+    }
+  `);
+
   return (
     <div className={container}>
-              <header >
-                <img src={Logo}></img>
-              </header>
+      <header>
+        <img src={Logo}></img>
+      </header>
       <nav>
         <ul className={navLinks}>
           <li className={navLinkItem}>
@@ -57,7 +57,11 @@ const Layout = ({ pageTitle, children }) => {
               Basher
             </Link>
           </li>
-
+          <li className={navLinkItem}>
+            <Link to="/learn_to_draw" className={navLinkText}>
+              Learn To Draw
+            </Link>
+          </li>
         </ul>
       </nav>
       <main>
@@ -65,7 +69,7 @@ const Layout = ({ pageTitle, children }) => {
         {children}
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;
